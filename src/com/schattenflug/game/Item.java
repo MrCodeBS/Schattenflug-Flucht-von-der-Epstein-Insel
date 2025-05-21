@@ -25,8 +25,6 @@ public class Item {
         return canBeTaken;
     }
 
-
-
     // Overriding equals and hashCode for proper functioning in collections if needed
     @Override
     public boolean equals(Object o) {
