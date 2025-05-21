@@ -69,26 +69,39 @@ public class Game {
         System.out.println("Type 'help' for commands.");
 
         while (!gameOver) {
-            System.out.println("\n" + currentRoom.getDescription());
-            System.out.println(currentRoom.getExitsDescription());
-            System.out.println(currentRoom.getItemsDescription());
-            System.out.println("\n" + player.getInventoryDescription());
-            System.out.println("\nAvailable commands:");
-            System.out.println("north, south, east, west - Move in that direction");
-            System.out.println("take <item> - Pick up an item");
-            System.out.println("drop <item> - Drop an item");
-            System.out.println("use <item> - Use an item");
-            System.out.println("inventory - View your inventory");
-            System.out.println("look - Look around the current room");
-            System.out.println("help - Show this help message");
-            System.out.println("quit - Exit the game");
+            try {
+                System.out.println("\n" + currentRoom.getDescription());
+                System.out.println(currentRoom.getExitsDescription());
+                System.out.println(currentRoom.getItemsDescription());
+                System.out.println("\n" + player.getInventoryDescription());
+                System.out.println("\nAvailable commands:");
+                System.out.println("north, south, east, west - Move in that direction");
+                System.out.println("take <item> - Pick up an item");
+                System.out.println("drop <item> - Drop an item");
+                System.out.println("use <item> - Use an item");
+                System.out.println("inventory - View your inventory");
+                System.out.println("look - Look around the current room");
+                System.out.println("help - Show this help message");
+                System.out.println("quit - Exit the game");
 
-            System.out.print("\nWhat would you like to do? ");
-            String command = scanner.nextLine().toLowerCase().trim();
+                System.out.print("\nWhat would you like to do? ");
+                if (!scanner.hasNextLine()) {
+                    gameOver = true;
+                    System.out.println("\nGame terminated.");
+                    break;
+                }
+                String command = scanner.nextLine().toLowerCase().trim();
 
-            clearScreen();
-            processCommand(command);
+                clearScreen();
+                processCommand(command);
+            } catch (Exception e) {
+                System.out.println("\nAn error occurred. Please try again.");
+                if (scanner.hasNextLine()) {
+                    scanner.nextLine(); // Clear the error input
+                }
+            }
         }
+        scanner.close();
     }
 
     private void processCommand(String command) {

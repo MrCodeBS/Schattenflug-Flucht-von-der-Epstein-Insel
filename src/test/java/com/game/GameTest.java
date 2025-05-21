@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
+import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ public class GameTest {
     private Game game;
     private ByteArrayOutputStream outputStream;
     private PrintStream originalOut;
+    private ByteArrayInputStream inputStream;
 
     @BeforeEach
     void setUp() {
@@ -20,6 +22,18 @@ public class GameTest {
         outputStream = new ByteArrayOutputStream();
         originalOut = System.out;
         System.setOut(new PrintStream(outputStream));
+    }
+
+    @AfterEach
+    void tearDown() {
+        System.setOut(originalOut);
+        if (inputStream != null) {
+            try {
+                inputStream.close();
+            } catch (Exception e) {
+                // Ignore close errors
+            }
+        }
     }
 
     @Test
@@ -46,7 +60,8 @@ public class GameTest {
 
         // Create input stream with commands
         String input = String.join("\n", commands);
-        System.setIn(new ByteArrayInputStream(input.getBytes()));
+        inputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(inputStream);
 
         // Run the game
         game.play();
@@ -76,7 +91,8 @@ public class GameTest {
         };
 
         String input = String.join("\n", commands);
-        System.setIn(new ByteArrayInputStream(input.getBytes()));
+        inputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(inputStream);
 
         game.play();
 
@@ -98,7 +114,8 @@ public class GameTest {
         };
 
         String input = String.join("\n", commands);
-        System.setIn(new ByteArrayInputStream(input.getBytes()));
+        inputStream = new ByteArrayInputStream(input.getBytes());
+        System.setIn(inputStream);
 
         game.play();
 
