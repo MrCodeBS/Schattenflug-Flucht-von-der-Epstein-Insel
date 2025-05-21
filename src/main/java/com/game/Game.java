@@ -8,12 +8,16 @@ public class Game {
     private boolean gameOver;
     private Scanner scanner;
     private Player player;
+    private boolean hasSecurityAccess;
+    private boolean isDisguised;
 
     public Game() {
         initializeRooms();
         scanner = new Scanner(System.in);
         gameOver = false;
         player = new Player();
+        hasSecurityAccess = false;
+        isDisguised = false;
     }
 
     private void initializeRooms() {
@@ -165,10 +169,23 @@ public class Game {
         Room nextRoom = currentRoom.getExit(fullDirection);
         if (nextRoom == null) {
             System.out.println("You cannot go that way!");
-        } else {
-            currentRoom = nextRoom;
-            System.out.println("You move " + fullDirection + ".");
+            return;
         }
+
+        // Check for restricted access
+        if (nextRoom.getName().equals("Sicherheitszentrale") && !hasSecurityAccess) {
+            System.out.println("You need a security card to access this area!");
+            return;
+        }
+
+        // Check for disguise requirement
+        if (nextRoom.getName().equals("Hauptvilla") && !isDisguised) {
+            System.out.println("You need a disguise to enter the main villa!");
+            return;
+        }
+
+        currentRoom = nextRoom;
+        System.out.println("You move " + fullDirection + ".");
     }
 
     private void takeItem(String itemName) {
@@ -219,12 +236,37 @@ public class Game {
             return;
         }
 
-        System.out.println("You used the " + item.getName() + "!");
+        switch (item.getName().toLowerCase()) {
+            case "sicherheitskarte":
+                hasSecurityAccess = true;
+                System.out.println("You use the security card. You now have access to restricted areas!");
+                break;
+            case "verkleidungskit":
+                isDisguised = true;
+                System.out.println("You use the disguise kit. You now look like staff!");
+                break;
+            case "laptop":
+                System.out.println("You access the laptop and find incriminating evidence!");
+                break;
+            case "festplatte":
+                System.out.println("You connect the hard drive and find more evidence!");
+                break;
+            case "bolzenschneider":
+                System.out.println("You use the bolt cutters to break through a locked gate!");
+                break;
+            case "stock":
+                System.out.println("You use the stick to check for traps ahead.");
+                break;
+            default:
+                System.out.println("You can't find a use for the " + item.getName() + " right now.");
+                player.addItem(item); // Return the item if it can't be used
+                return;
+        }
     }
 
     private void showHelp() {
         System.out.println("\nAvailable commands:");
-        System.out.println("north, south, east, west - Move in that direction");
+        System.out.println("north/n, south/s, east/e, west/w - Move in that direction");
         System.out.println("take <item> - Pick up an item");
         System.out.println("drop <item> - Drop an item");
         System.out.println("use <item> - Use an item");

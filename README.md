@@ -58,6 +58,39 @@ The game features the following locations:
 - Some items are required to progress
 - Using certain items will consume them
 
+## Game Guide: How to Win
+
+### Step 1: Initial Exploration
+1. Start at the Strand (beach)
+2. Take the Stock (stick) - it might be useful later
+3. Head north to the Dschungelpfad (jungle path)
+
+### Step 2: Collect Essential Items
+1. Go east to Personalquartiere (staff quarters)
+   - Take the Verkleidungskit (disguise kit)
+2. Go north to Hauptvilla (main villa)
+   - Take the Laptop
+   - Take the Festplatte (hard drive)
+3. Go east to Sicherheitszentrale (security center)
+   - Take the Sicherheitskarte (security card)
+
+### Step 3: Use Items Strategically
+1. Use the Sicherheitskarte (security card) to gain access to restricted areas
+2. The Verkleidungskit (disguise kit) will help you move unnoticed
+3. The Laptop and Festplatte contain crucial evidence
+
+### Step 4: Escape
+1. From Sicherheitszentrale, go north to Helipad-Pfad
+2. Continue north to reach the Helipad
+3. Congratulations! You've escaped with the evidence!
+
+### Tips
+- Manage your inventory weight carefully
+- Some items are required to progress
+- Use items at the right time
+- Explore all rooms thoroughly
+- Keep track of your collected evidence
+
 ## Installation
 
 1. Ensure you have Java 17 or later installed
