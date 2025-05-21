@@ -111,9 +111,13 @@ public class Game {
 
         switch (action) {
             case "north":
+            case "n":
             case "south":
+            case "s":
             case "east":
+            case "e":
             case "west":
+            case "w":
                 move(action);
                 break;
             case "take":
@@ -144,12 +148,26 @@ public class Game {
     }
 
     private void move(String direction) {
-        Room nextRoom = currentRoom.getExit(direction);
+        // Convert single-letter directions to full words
+        String fullDirection = switch (direction) {
+            case "n" ->
+                "north";
+            case "s" ->
+                "south";
+            case "e" ->
+                "east";
+            case "w" ->
+                "west";
+            default ->
+                direction;
+        };
+
+        Room nextRoom = currentRoom.getExit(fullDirection);
         if (nextRoom == null) {
             System.out.println("You cannot go that way!");
         } else {
             currentRoom = nextRoom;
-            System.out.println("You move " + direction + ".");
+            System.out.println("You move " + fullDirection + ".");
         }
     }
 
