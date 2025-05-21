@@ -130,6 +130,16 @@ public class Game {
         }
     }
 
+    private void move(String direction) {
+        Room nextRoom = currentRoom.getExit(direction);
+        if (nextRoom == null) {
+            System.out.println("You cannot go that way!");
+        } else {
+            currentRoom = nextRoom;
+            System.out.println("You move " + direction + ".");
+        }
+    }
+
     private void takeItem(String itemName) {
         if (itemName.isEmpty()) {
             System.out.println("What would you like to take?");
@@ -179,16 +189,6 @@ public class Game {
         }
 
         System.out.println("You used the " + item.getName() + "!");
-        // Here you can add specific item usage logic for different items
-    }
-
-    private void move(String direction) {
-        Room nextRoom = currentRoom.getExit(direction);
-        if (nextRoom == null) {
-            System.out.println("You cannot go that way!");
-        } else {
-            currentRoom = nextRoom;
-        }
     }
 
     private void showHelp() {
