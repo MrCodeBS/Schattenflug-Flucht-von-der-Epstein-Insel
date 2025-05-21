@@ -1,5 +1,9 @@
 package com.game;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Game {
@@ -10,6 +14,9 @@ public class Game {
     private Player player;
     private boolean hasSecurityAccess;
     private boolean isDisguised;
+    private boolean isDiddyPresent;
+    private Random random;
+    private static final String JUMPSCARE_FILE = "assets/pdiddy-jumpscare.txt";
 
     public Game() {
         initializeRooms();
@@ -18,6 +25,8 @@ public class Game {
         player = new Player();
         hasSecurityAccess = false;
         isDisguised = false;
+        isDiddyPresent = false;
+        random = new Random();
     }
 
     private void initializeRooms() {
@@ -30,6 +39,7 @@ public class Game {
         Room sicherheitszentrale = new Room("Sicherheitszentrale", "The security center with surveillance monitors.");
         Room helipadPfad = new Room("Helipad-Pfad", "A path leading to the helipad.");
         Room helipad = new Room("Helipad", "A large helipad with a helicopter waiting.");
+        Room whiteParty = new Room("White Party", "A luxurious party room decorated entirely in white. P Diddy's favorite spot.");
 
         // Set up room connections
         strand.setExit("north", dschungelpfad);
@@ -42,12 +52,14 @@ public class Game {
         wartungsschuppen.setExit("north", sicherheitszentrale);
         hauptvilla.setExit("south", personalquartiere);
         hauptvilla.setExit("east", sicherheitszentrale);
+        hauptvilla.setExit("north", whiteParty);
         sicherheitszentrale.setExit("west", hauptvilla);
         sicherheitszentrale.setExit("south", wartungsschuppen);
         sicherheitszentrale.setExit("north", helipadPfad);
         helipadPfad.setExit("south", sicherheitszentrale);
         helipadPfad.setExit("north", helipad);
         helipad.setExit("south", helipadPfad);
+        whiteParty.setExit("south", hauptvilla);
 
         // Add items to rooms
         strand.addItem(new Item("Stock", "A sturdy wooden stick", 1.0));
@@ -56,6 +68,7 @@ public class Game {
         sicherheitszentrale.addItem(new Item("Sicherheitskarte", "A security access card", 0.1));
         hauptvilla.addItem(new Item("Laptop", "A laptop computer", 2.5));
         hauptvilla.addItem(new Item("Festplatte", "An external hard drive", 0.5));
+        whiteParty.addItem(new Item("Champagne", "A bottle of expensive champagne", 1.0));
 
         // Set starting room
         currentRoom = strand;
@@ -184,6 +197,18 @@ public class Game {
             return;
         }
 
+        // Check for P Diddy in White Party room
+        if (nextRoom.getName().equals("White Party")) {
+            isDiddyPresent = random.nextBoolean();
+            if (isDiddyPresent) {
+                System.out.println("P Diddy is here! He challenges you to a game!");
+                playWhitePartyGame();
+                if (gameOver) {
+                    return;
+                }
+            }
+        }
+
         currentRoom = nextRoom;
         System.out.println("You move " + fullDirection + ".");
     }
@@ -274,6 +299,44 @@ public class Game {
         System.out.println("look - Look around the current room");
         System.out.println("help - Show this help message");
         System.out.println("quit - Exit the game");
+    }
+
+    private void showJumpscare() {
+        try {
+            String jumpscare = Files.readString(Paths.get(JUMPSCARE_FILE));
+            clearScreen();
+            System.out.println(jumpscare);
+            System.out.println("\nGAME OVER - P DIDDY CAUGHT YOU!");
+            System.out.println("Press Enter to exit...");
+            scanner.nextLine();
+            gameOver = true;
+        } catch (IOException e) {
+            System.out.println("P DIDDY CAUGHT YOU! GAME OVER!");
+            gameOver = true;
+        }
+    }
+
+    private void playWhitePartyGame() {
+        System.out.println("\nP Diddy challenges you to a drinking game!");
+        System.out.println("You need to guess the number of champagne bottles (1-10) to win.");
+        System.out.println("If you lose, you'll be caught!");
+
+        int correctNumber = random.nextInt(10) + 1;
+        System.out.print("How many bottles do you think there are? (1-10): ");
+
+        try {
+            int guess = Integer.parseInt(scanner.nextLine());
+            if (guess == correctNumber) {
+                System.out.println("You won! P Diddy is impressed and lets you pass.");
+                isDiddyPresent = false;
+            } else {
+                System.out.println("Wrong guess! The correct number was " + correctNumber);
+                showJumpscare();
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input! P Diddy catches you trying to cheat!");
+            showJumpscare();
+        }
     }
 
     public static void main(String[] args) {
