@@ -2,15 +2,14 @@ package com.schattenflug.game;
 
 public class Item {
 
-    private String name; // e.g., KEY, LANTERN
-    private String description;
-    private boolean canBeTaken; // Can the player pick this item up?
-    // Add more properties as needed: isUsable, isWeapon, etc.
+    private final String name;
+    private final String description;
+    private final double weight;
 
-    public Item(String name, String description, boolean canBeTaken) {
-        this.name = name.toUpperCase(); // Store names in uppercase for easier comparison
+    public Item(String name, String description, double weight) {
+        this.name = name;
         this.description = description;
-        this.canBeTaken = canBeTaken;
+        this.weight = weight;
     }
 
     public String getName() {
@@ -21,25 +20,29 @@ public class Item {
         return description;
     }
 
-    public boolean canBeTaken() {
-        return canBeTaken;
+    public double getWeight() {
+        return weight;
     }
 
-    // Overriding equals and hashCode for proper functioning in collections if needed
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public String toString() {
+        return name + " - " + description + " (Weight: " + weight + ")";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        Item item = (Item) o;
-        return name.equals(item.name);
+        Item other = (Item) obj;
+        return name.equalsIgnoreCase(other.name);
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return name.toLowerCase().hashCode();
     }
 }
