@@ -1,0 +1,50 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Schattenflug: Flucht von der Epstein-Insel - Game Requirements
+
+This document outlines the core requirements for the Java CLI game "Schattenflug: Flucht von der Epstein-Insel", based on the project description and teacher's requirements.
+
+## Core Requirements:
+
+*   **Game Type:** Text-based adventure game similar to ZORK, implemented fully in Java using the Command Line Interface (CLI).
+*   **Object-Oriented Design:** Utilize classes, objects, properties, and methods extensively.
+*   **Room Implementation:** Create a system for rooms with descriptions and defined exits (N, S, E, W).
+*   **Room Layout:** Implement the specific room layout:
+    *   Strand (Start)
+    *   Dschungelpfad
+    *   Personalquartiere
+    *   Wartungsschuppen
+    *   Hauptvilla
+    *   Sicherheitszentrale
+    *   Helipad-Pfad
+    *   Helipad (Ende)
+    *   (Optional) Geheime Orte (Underground Tunnel, Hidden Cave)
+*   **Player Movement:** Allow player movement between rooms using simple commands (e.g., N, S, E, W, Back).
+*   **Items:** Implement collectible and interactive items within rooms (e.g., Stock, zerrissene Karte, Bolzenschneider, Verkleidungskit, Laptop, Sicherheitskarte, Festplatte).
+*   **Item Properties:** Implement properties for items, such as weight (Gewicht).
+*   **Inventory:** Implement a player inventory capable of holding multiple items with a potential maximum weight limit.
+*   **Winning Condition:** Define and implement a clear winning condition.
+*   **Puzzles/Challenges:** Include simple puzzles and interactions (e.g., Zahlenschloss, Geheimer Schalter).
+*   **NPCs/Dangers:** Represent dangers or NPCs in a text-based manner.
+*   **Input/Output:** Handle player input and display game information via the CLI.
+*   **Documentation:** Provide comprehensive Javadoc comments for all classes, methods, and significant code sections.
+
+## Excluded (Unrealistic for CLI):
+
+*   Audio playback
+*   Complex graphical elements
+
+## MUST HAVE Requirements:
+
+*   Writing JUnit tests.
+*   Implementing ATLEAST 1 inheritance for item types.
+
+
+
+
+
+
+
