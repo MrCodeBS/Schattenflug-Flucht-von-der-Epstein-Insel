@@ -329,6 +329,7 @@ public class Game {
             gameOver = true;
         } catch (IOException e) {
             System.out.println("P DIDDY CAUGHT YOU! GAME OVER!");
+            System.out.println("No Party like a P DIDDY Party!");
             gameOver = true;
         }
     }
