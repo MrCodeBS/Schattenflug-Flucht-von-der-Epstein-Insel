@@ -3,6 +3,10 @@ package com.schattenflug.game;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Random;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class Game {
 
@@ -10,12 +14,25 @@ public class Game {
     private Room currentRoom;
     private final Parser parser;
     private Map<String, Room> allRooms;
+    private Scanner scanner;
+    private boolean gameOver;
+    private boolean hasSecurityAccess;
+    private boolean isDisguised;
+    private boolean isDiddyPresent;
+    private boolean hasBabyOil;
+    private Random random;
+    private static final String BABY_OIL_FILE = "assets/baby-oil.txt";
 
     public Game() {
+        initializeRooms();
+        scanner = new Scanner(System.in);
+        gameOver = false;
         player = new Player();
-        parser = new Parser();
-        allRooms = new HashMap<>();
-        createWorld();
+        hasSecurityAccess = false;
+        isDisguised = false;
+        isDiddyPresent = false;
+        hasBabyOil = false;
+        random = new Random();
 
         this.currentRoom = allRooms.get("BEACH");
 
@@ -28,30 +45,59 @@ public class Game {
         }
     }
 
+    private void initializeRooms() {
+        allRooms = new HashMap<>();
+        createWorld();
+    }
+
     private void createWorld() {
-        Room beach = new Room("BEACH",
-                "The pale moonlight casts long, dancing shadows from the swaying palm trees. The sand, usually golden, appears a ghostly white, littered with damp seaweed and the occasional broken shell. Far out, the dark, choppy waves of the ocean glitter ominously under the night sky.\nSounds: The rhythmic crash of waves against the shore is a constant, punctuated by the rustling of palm fronds in the salty breeze and the distant, unsettling cry of a night bird.\nSmells: The air is thick with the smell of salt, damp sand, and decaying marine life.");
-        Room junglePath = new Room("JUNGLE_PATH",
-                "The jungle canopy is so dense that only slivers of moonlight penetrate, leaving the path shrouded in deep, oppressive darkness. Twisted vines hang like snares, and unfamiliar, broad-leafed plants brush against you as you move.\nSounds: A cacophony of unseen creatures – insects, frogs, and the rustle of something in the undergrowth.\nSmells: Damp earth, decaying leaves, and a sweet, cloying floral fragrance.");
-        Room villaExterior = new Room("VILLA_EXTERIOR",
-                "The villa looms before you, a stark silhouette against the bruised twilight sky. Some windows are dark, others emit a faint, flickering light. The gardens are overgrown.\nSounds: A low hum (generator?), occasional crunch of gravel, muffled voices.\nSmells: Salt, damp jungle, and a faint acrid chemical smell.");
+        Room beach = new Room("Strand", "You are on a sandy beach. The ocean waves crash against the shore.");
+        Room junglePath = new Room("Dschungelpfad", "A dense jungle path with tall trees and thick vegetation.");
+        Room staffQuarters = new Room("Personalquartiere", "The staff quarters. Bunk beds line the walls.");
+        Room maintenanceShed = new Room("Wartungsschuppen", "A maintenance shed filled with tools and equipment.");
+        Room mainVilla = new Room("Hauptvilla", "The main villa. Luxurious furniture and expensive art pieces.");
+        Room securityCenter = new Room("Sicherheitszentrale", "The security center with surveillance monitors.");
+        Room helipadPath = new Room("Helipad-Pfad", "A path leading to the helipad.");
+        Room helipad = new Room("Helipad", "A large helipad with a helicopter waiting.");
+        Room whiteParty = new Room("White Party", "A luxurious party room decorated entirely in white. P Diddy's favorite spot.");
 
-        Item driftwoodStock = new Item("STOCK", "A sturdy piece of driftwood, surprisingly well-balanced. One end is splintered.", true);
-        Item boltCutters = new Item("BOLTCUTTERS", "Heavy-duty bolt cutters. The jaws are sharp and powerful.", true);
-        Item laptop = new Item("LAPTOP", "A sleek, modern laptop, surprisingly intact. The screen is dark.", true);
+        beach.addItem(new Item("Stock", "A sturdy wooden stick", 1.0));
+        maintenanceShed.addItem(new Item("Bolzenschneider", "Heavy-duty bolt cutters", 3.0));
+        staffQuarters.addItem(new Item("Verkleidungskit", "A disguise kit with various items", 2.0));
+        staffQuarters.addItem(new Item("Baby Oil", "A bottle of baby oil. P Diddy's favorite.", 0.5));
+        securityCenter.addItem(new Item("Sicherheitskarte", "A security access card", 0.1));
+        mainVilla.addItem(new Item("Laptop", "A laptop computer", 2.5));
+        mainVilla.addItem(new Item("Festplatte", "An external hard drive", 0.5));
+        whiteParty.addItem(new Item("Champagne", "A bottle of expensive champagne", 1.0));
 
-        beach.addItem(driftwoodStock);
-        junglePath.addItem(boltCutters);
-        villaExterior.addItem(laptop);
+        beach.setExit("north", junglePath);
+        junglePath.setExit("south", beach);
+        junglePath.setExit("east", staffQuarters);
+        junglePath.setExit("west", maintenanceShed);
+        staffQuarters.setExit("west", junglePath);
+        staffQuarters.setExit("north", mainVilla);
+        maintenanceShed.setExit("east", junglePath);
+        maintenanceShed.setExit("north", securityCenter);
+        mainVilla.setExit("south", staffQuarters);
+        mainVilla.setExit("east", securityCenter);
+        mainVilla.setExit("north", whiteParty);
+        securityCenter.setExit("west", mainVilla);
+        securityCenter.setExit("south", maintenanceShed);
+        securityCenter.setExit("north", helipadPath);
+        helipadPath.setExit("south", securityCenter);
+        helipadPath.setExit("north", helipad);
+        helipad.setExit("south", helipadPath);
+        whiteParty.setExit("south", mainVilla);
 
-        allRooms.put(beach.getName().toUpperCase(), beach);
-        allRooms.put(junglePath.getName().toUpperCase(), junglePath);
-        allRooms.put(villaExterior.getName().toUpperCase(), villaExterior);
-
-        beach.setExit("NORTH", junglePath);
-        junglePath.setExit("SOUTH", beach);
-        junglePath.setExit("EAST", villaExterior);
-        villaExterior.setExit("WEST", junglePath);
+        allRooms.put("BEACH", beach);
+        allRooms.put("JUNGLE_PATH", junglePath);
+        allRooms.put("STAFF_QUARTERS", staffQuarters);
+        allRooms.put("MAINTENANCE_SHED", maintenanceShed);
+        allRooms.put("MAIN_VILLA", mainVilla);
+        allRooms.put("SECURITY_CENTER", securityCenter);
+        allRooms.put("HELIPAD_PATH", helipadPath);
+        allRooms.put("HELIPAD", helipad);
+        allRooms.put("WHITE_PARTY", whiteParty);
     }
 
     public void play() {
@@ -240,6 +286,87 @@ public class Game {
             }
         } else {
             System.out.println("Nothing interesting happens.");
+        }
+    }
+
+    private void useItem(String itemName) {
+        if (itemName.isEmpty()) {
+            System.out.println("What would you like to use?");
+            return;
+        }
+
+        Item item = player.removeItem(itemName);
+        if (item == null) {
+            System.out.println("You don't have a " + itemName + ".");
+            return;
+        }
+
+        switch (item.getName().toLowerCase()) {
+            case "sicherheitskarte":
+                hasSecurityAccess = true;
+                System.out.println("You use the security card. You now have access to restricted areas!");
+                break;
+            case "verkleidungskit":
+                isDisguised = true;
+                System.out.println("You use the disguise kit. You now look like staff!");
+                break;
+            case "laptop":
+                System.out.println("You access the laptop and find incriminating evidence!");
+                break;
+            case "festplatte":
+                System.out.println("You connect the hard drive and find more evidence!");
+                break;
+            case "bolzenschneider":
+                System.out.println("You use the bolt cutters to break through a locked gate!");
+                break;
+            case "stock":
+                System.out.println("You use the stick to check for traps ahead.");
+                break;
+            case "baby oil":
+                hasBabyOil = true;
+                System.out.println("You take out the baby oil. It might come in handy...");
+                break;
+            default:
+                System.out.println("You can't find a use for the " + item.getName() + " right now.");
+                player.addItem(item); // Return the item if it can't be used
+                return;
+        }
+    }
+
+    private void playWhitePartyGame() {
+        System.out.println("\nP Diddy challenges you to a drinking game!");
+
+        if (hasBabyOil) {
+            try {
+                String babyOilArt = Files.readString(Paths.get(BABY_OIL_FILE));
+                System.out.println("\nYou present P Diddy with the baby oil...");
+                System.out.println(babyOilArt);
+                System.out.println("\nP Diddy is impressed! He lets you pass without playing the game.");
+                isDiddyPresent = false;
+                return;
+            } catch (IOException e) {
+                System.out.println("You try to show P Diddy the baby oil, but something goes wrong!");
+            }
+        }
+
+        System.out.println("You need to guess the number of champagne bottles (1-10) to win.");
+        System.out.println("If you lose, you'll be caught!");
+
+        int correctNumber = random.nextInt(10) + 1;
+        System.out.print("How many bottles do you think there are? (1-10): ");
+
+        try {
+            int guess = Integer.parseInt(scanner.nextLine());
+            if (guess == correctNumber) {
+                System.out.println("You won! P Diddy is impressed and lets you pass.");
+                isDiddyPresent = false;
+            } else {
+                System.out.println("Wrong guess! The correct number was " + correctNumber);
+                showJumpscare();
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input! P Diddy catches you trying to cheat!");
+            showJumpscare();
         }
     }
 
