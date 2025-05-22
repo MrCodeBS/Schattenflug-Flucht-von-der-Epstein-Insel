@@ -64,9 +64,9 @@ public class Game {
         // Add items to rooms
         strand.addItem(new Item("Stock", "A sturdy wooden stick", 1.0));
         wartungsschuppen.addItem(new Item("Bolzenschneider", "Heavy-duty bolt cutters", 3.0));
+        wartungsschuppen.addItem(new Item("Sicherheitskarte", "A security access card", 0.1));
         personalquartiere.addItem(new Item("Verkleidungskit", "A disguise kit with various items", 2.0));
-        sicherheitszentrale.addItem(new Item("Sicherheitskarte", "A security access card", 0.1));
-        hauptvilla.addItem(new Item("Laptop", "A laptop computer", 2.5));
+        sicherheitszentrale.addItem(new Item("Laptop", "A laptop computer", 2.5));
         hauptvilla.addItem(new Item("Festplatte", "An external hard drive", 0.5));
         hauptvilla.addItem(new Item("Baby Oil", "A bottle of premium baby oil. P Diddy's favorite.", 0.3));
         whiteParty.addItem(new Item("Champagne", "A bottle of expensive champagne", 1.0));
@@ -207,6 +207,22 @@ public class Game {
                 if (gameOver) {
                     return;
                 }
+            }
+        }
+
+        // Check for win condition at helipad
+        if (nextRoom.getName().equals("Helipad")) {
+            if (player.hasItem("Laptop") && player.hasItem("Festplatte")) {
+                System.out.println("\nCongratulations! You've successfully escaped with the evidence!");
+                System.out.println("You've collected enough proof to expose the truth about the island.");
+                System.out.println("Pilot L. Cavuoti nods approvingly as you board the helicopter.");
+                System.out.println("The helicopter takes off, and you're finally free!");
+                gameOver = true;
+                return;
+            } else {
+                System.out.println("\nYou need both the laptop and hard drive with evidence to escape!");
+                System.out.println("Go back and collect the missing items.");
+                return;
             }
         }
 
