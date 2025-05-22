@@ -68,6 +68,7 @@ public class Game {
         sicherheitszentrale.addItem(new Item("Sicherheitskarte", "A security access card", 0.1));
         hauptvilla.addItem(new Item("Laptop", "A laptop computer", 2.5));
         hauptvilla.addItem(new Item("Festplatte", "An external hard drive", 0.5));
+        hauptvilla.addItem(new Item("Baby Oil", "A bottle of premium baby oil. P Diddy's favorite.", 0.3));
         whiteParty.addItem(new Item("Champagne", "A bottle of expensive champagne", 1.0));
 
         // Set starting room
@@ -320,6 +321,23 @@ public class Game {
         System.out.println("\nP Diddy challenges you to a drinking game!");
         System.out.println("You need to guess the number of champagne bottles (1-10) to win.");
         System.out.println("If you lose, you'll be caught!");
+        System.out.println("Or... you could try bribing him with something he likes...");
+
+        // Check if player has baby oil
+        if (player.hasItem("Baby Oil")) {
+            System.out.println("\nYou notice P Diddy's eyes light up when he sees your bottle of baby oil.");
+            System.out.println("Would you like to bribe him with the baby oil? (yes/no)");
+            String response = scanner.nextLine().toLowerCase();
+
+            if (response.equals("yes")) {
+                System.out.println("\nP Diddy's face breaks into a wide grin.");
+                System.out.println("'Now that's what I'm talking about!' he exclaims.");
+                System.out.println("He takes the baby oil and lets you pass without any further questions.");
+                player.removeItem("Baby Oil");
+                isDiddyPresent = false;
+                return;
+            }
+        }
 
         int correctNumber = random.nextInt(10) + 1;
         System.out.print("How many bottles do you think there are? (1-10): ");

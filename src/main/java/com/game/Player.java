@@ -59,6 +59,11 @@ public class Player {
     }
 
     public boolean hasItem(String itemName) {
-        return getItem(itemName) != null;
+        for (Item item : inventory) {
+            if (item.getName().equalsIgnoreCase(itemName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
