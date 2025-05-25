@@ -3,6 +3,8 @@ package com.game;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -15,6 +17,9 @@ public class Game {
     private boolean hasSecurityAccess;
     private boolean isDisguised;
     private boolean isDiddyPresent;
+    private boolean isLeBronFreed;
+    private boolean bribedDiddy;
+    private List<String> achievements;
     private Random random;
     private static final String JUMPSCARE_FILE = "assets/pdiddy-jumpscare.txt";
 
@@ -26,6 +31,9 @@ public class Game {
         hasSecurityAccess = false;
         isDisguised = false;
         isDiddyPresent = false;
+        isLeBronFreed = false;
+        bribedDiddy = false;
+        achievements = new ArrayList<>();
         random = new Random();
     }
 
@@ -39,7 +47,7 @@ public class Game {
         Room sicherheitszentrale = new Room("Sicherheitszentrale", "The security center with surveillance monitors.");
         Room helipadPfad = new Room("Helipad-Pfad", "A path leading to the helipad.");
         Room helipad = new Room("Helipad", "A large helipad with a helicopter waiting.");
-        Room whiteParty = new Room("White Party", "A luxurious party room decorated entirely in white. P Diddy's favorite spot.");
+        Room whiteParty = new Room("White Party", "A luxurious party room decorated entirely in white. P Diddy's favorite spot. There's a large cage in the corner with LeBron James inside!");
 
         // Set up room connections
         strand.setExit("north", dschungelpfad);
@@ -64,7 +72,7 @@ public class Game {
         // Add items to rooms
         strand.addItem(new Item("Stock", "A sturdy wooden stick", 1.0));
         wartungsschuppen.addItem(new Item("Bolzenschneider", "Heavy-duty bolt cutters", 3.0));
-        wartungsschuppen.addItem(new Item("Sicherheitskarte", "A security access card", 0.1));
+        wartungsschuppen.addHiddenItem(new Item("Sicherheitskarte", "A security access card", 0.1));
         personalquartiere.addItem(new Item("Verkleidungskit", "A disguise kit with various items", 2.0));
         sicherheitszentrale.addItem(new Item("Laptop", "A laptop computer", 2.5));
         hauptvilla.addItem(new Item("Festplatte", "An external hard drive", 0.5));
@@ -98,6 +106,7 @@ public class Game {
                 System.out.println("drop <item> - Drop an item");
                 System.out.println("use <item> - Use an item");
                 System.out.println("inventory - View your inventory");
+                System.out.println("achievements - View your achievements");
                 System.out.println("look - Look around the current room");
                 System.out.println("help - Show this help message");
                 System.out.println("quit - Exit the game");
@@ -150,8 +159,18 @@ public class Game {
             case "inventory":
                 System.out.println(player.getInventoryDescription());
                 break;
+            case "achievements":
+                showAchievements();
+                break;
             case "look":
-                // Room description is already shown in the main loop
+                if (currentRoom.getName().equals("Wartungsschuppen")) {
+                    System.out.println("\nYou carefully search through the maintenance shed...");
+                    System.out.println("Behind some tools, you find a security card!");
+                    currentRoom.revealHiddenItems();
+                }
+                System.out.println("\n" + currentRoom.getDescription());
+                System.out.println(currentRoom.getExitsDescription());
+                System.out.println(currentRoom.getItemsDescription());
                 break;
             case "help":
                 showHelp();
@@ -213,12 +232,20 @@ public class Game {
         // Check for win condition at helipad
         if (nextRoom.getName().equals("Helipad")) {
             if (player.hasItem("Laptop") && player.hasItem("Festplatte")) {
-                System.out.println("\nCongratulations! You've successfully escaped with the evidence!");
-                System.out.println("You've collected enough proof to expose the truth about the island.");
-                System.out.println("Pilot L. Cavuoti nods approvingly as you board the helicopter.");
-                System.out.println("The helicopter takes off, and you're finally free!");
-                gameOver = true;
-                return;
+                if (player.hasItem("Champagne")) {
+                    System.out.println("\nCongratulations! You've successfully escaped with the evidence!");
+                    System.out.println("You offer the champagne to Pilot L. Cavuoti, who accepts it with a smile.");
+                    System.out.println("'This is exactly what I needed to make this flight worth my while,' he says.");
+                    System.out.println("The helicopter takes off, and you're finally free!");
+                    showWinScreen();
+                    gameOver = true;
+                    return;
+                } else {
+                    System.out.println("\nPilot L. Cavuoti looks at you suspiciously.");
+                    System.out.println("'I don't fly for free, you know. Bring me something nice from the White Party,' he says.");
+                    System.out.println("You need to find something to bribe the pilot with!");
+                    return;
+                }
             } else {
                 System.out.println("\nYou need both the laptop and hard drive with evidence to escape!");
                 System.out.println("Go back and collect the missing items.");
@@ -294,7 +321,15 @@ public class Game {
                 System.out.println("You connect the hard drive and find more evidence!");
                 break;
             case "bolzenschneider":
-                System.out.println("You use the bolt cutters to break through a locked gate!");
+                if (currentRoom.getName().equals("White Party") && !isLeBronFreed) {
+                    System.out.println("\nYou use the bolt cutters to break the lock on LeBron's cage!");
+                    System.out.println("LeBron James jumps out and gives you a high-five.");
+                    System.out.println("'Thanks for the rescue! I owe you one!' he says.");
+                    isLeBronFreed = true;
+                    achievements.add("LeBron's Savior - Freed LeBron James from P Diddy's cage");
+                } else {
+                    System.out.println("You use the bolt cutters to break through a locked gate!");
+                }
                 break;
             case "stock":
                 System.out.println("You use the stick to check for traps ahead.");
@@ -313,6 +348,7 @@ public class Game {
         System.out.println("drop <item> - Drop an item");
         System.out.println("use <item> - Use an item");
         System.out.println("inventory - View your inventory");
+        System.out.println("achievements - View your achievements");
         System.out.println("look - Look around the current room");
         System.out.println("help - Show this help message");
         System.out.println("quit - Exit the game");
@@ -329,9 +365,51 @@ public class Game {
             gameOver = true;
         } catch (IOException e) {
             System.out.println("P DIDDY CAUGHT YOU! GAME OVER!");
-            System.out.println("No Party like a P DIDDY Party!");
             gameOver = true;
         }
+    }
+
+    private void showWinScreen() {
+        clearScreen();
+        System.out.println("\n" + "=".repeat(50));
+        System.out.println("                    VICTORY ACHIEVED!");
+        System.out.println("=".repeat(50) + "\n");
+
+        System.out.println("You've successfully escaped the island with the evidence!");
+        System.out.println("Your story will be told for generations to come.\n");
+
+        if (isLeBronFreed) {
+            System.out.println("LeBron James joins you on the helicopter.");
+            System.out.println("'I'll make sure you get a courtside seat at my next game!' he promises.");
+            System.out.println("The NBA superstar owes you one!\n");
+        }
+
+        if (bribedDiddy) {
+            System.out.println("P Diddy waves goodbye from the White Party room.");
+            System.out.println("'Thanks for the baby oil! Maybe we'll meet again at another party!'");
+            System.out.println("You made a powerful friend today...\n");
+        }
+
+        System.out.println("\nAchievements Unlocked:");
+        for (String achievement : achievements) {
+            System.out.println("- " + achievement);
+        }
+
+        if (isLeBronFreed && bribedDiddy) {
+            System.out.println("\n" + "=".repeat(50));
+            System.out.println("              PERFECT ENDING ACHIEVED!");
+            System.out.println("=".repeat(50));
+            System.out.println("You've completed the game with all possible achievements!");
+            System.out.println("Not only did you escape with the evidence, but you also:");
+            System.out.println("- Freed LeBron James from captivity");
+            System.out.println("- Made friends with P Diddy");
+            System.out.println("A true master of diplomacy and heroism!");
+            System.out.println("0.5% Chance of a heli Crash cause the champagne tasted to good,");
+            System.out.println(" you might be joining Kobe!");
+        }
+
+        System.out.println("\nPress Enter to exit...");
+        scanner.nextLine();
     }
 
     private void playWhitePartyGame() {
@@ -352,6 +430,8 @@ public class Game {
                 System.out.println("He takes the baby oil and lets you pass without any further questions.");
                 player.removeItem("Baby Oil");
                 isDiddyPresent = false;
+                bribedDiddy = true;
+                achievements.add("Diddy's Friend - Made friends with P Diddy using baby oil");
                 return;
             }
         }
@@ -371,6 +451,17 @@ public class Game {
         } catch (NumberFormatException e) {
             System.out.println("Invalid input! P Diddy catches you trying to cheat!");
             showJumpscare();
+        }
+    }
+
+    private void showAchievements() {
+        if (achievements.isEmpty()) {
+            System.out.println("\nNo achievements unlocked yet.");
+            return;
+        }
+        System.out.println("\nAchievements Unlocked:");
+        for (String achievement : achievements) {
+            System.out.println("- " + achievement);
         }
     }
 
